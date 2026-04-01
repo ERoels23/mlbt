@@ -213,6 +213,7 @@ fn draw_gameday(f: &mut Frame, rect: Rect, app: &mut App) {
             state: &app.state.gameday,
             boxscore_state: &mut app.state.box_score,
             chat_style_feed: app.settings.chat_style_feed,
+            pitcher_view: app.settings.pitcher_view,
         },
         rect,
     );

@@ -11,6 +11,7 @@ pub struct AppSettings {
     pub timezone_abbreviation: String,
     pub log_level: Option<LevelFilter>,
     pub chat_style_feed: bool,
+    pub pitcher_view: bool,
 }
 
 impl AppSettings {

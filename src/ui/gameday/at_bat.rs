@@ -9,6 +9,7 @@ use tui::widgets::{Block, Borders, Paragraph, Wrap};
 pub struct AtBatWidget<'a> {
     pub game: &'a GameState,
     pub selected_at_bat: Option<u8>,
+    pub pitcher_view: bool,
 }
 
 impl Widget for AtBatWidget<'_> {
@@ -40,16 +41,37 @@ impl Widget for AtBatWidget<'_> {
         let height = strike_zone_top - strike_zone_bot;
         let coords = StrikeZone::build_coords(strike_zone_bot, strike_zone_top);
         let strike_zone_area = generate_strike_zone_area(kzone);
+        let pitcher_view = self.pitcher_view;
+        let cell_width = HOME_PLATE_WIDTH / 3.0;
+
+        let batter_side = self
+            .game
+            .players
+            .get(&at_bat.matchup.batter_id)
+            .map(|p| p.batter_side.as_str())
+            .unwrap_or("");
+        // In pitcher view: RHB stands on the right, LHB on the left.
+        // In umpire view: reversed. Switch hitters get no sprite.
+        let sprite_x: Option<f64> = match (batter_side, pitcher_view) {
+            ("R", true) | ("L", false) => Some(12.0),
+            ("L", true) | ("R", false) => Some(-20.0),
+            _ => None,
+        };
 
         // strike zone and pitch display
         Canvas::default()
             .block(Block::default().borders(Borders::NONE))
             .paint(|ctx| {
                 for (i, coord) in coords.iter().enumerate() {
+                    let x = if pitcher_view {
+                        -(coord.0 + cell_width)
+                    } else {
+                        coord.0
+                    };
                     let r = Rectangle {
-                        x: coord.0,
+                        x,
                         y: coord.1,
-                        width: (HOME_PLATE_WIDTH / 3.0),
+                        width: cell_width,
                         height: (height / 3.0),
                         color: pitches.strike_zone.colors[i],
                     };
@@ -59,13 +81,23 @@ impl Widget for AtBatWidget<'_> {
                     if let Some(pitch) = &pe.pitch {
                         let ball = pitch.as_rectangle();
                         let pitch_count = pitch.index.to_string();
-                        ctx.draw(&ball);
+                        let (draw_x, label_x) = if pitcher_view {
+                            (-(ball.x + ball.width), -(ball.x + ball.width / 2.0))
+                        } else {
+                            (ball.x, ball.x)
+                        };
+                        ctx.draw(&Rectangle { x: draw_x, ..ball });
                         ctx.print(
-                            ball.x,
+                            label_x,
                             ball.y,
                             Span::styled(pitch_count, Style::default().fg(pitch.color)),
                         );
                     }
+                }
+                if let Some(x) = sprite_x {
+                    ctx.print(x, strike_zone_top + 4.0, Span::raw(" o"));
+                    ctx.print(x, (strike_zone_bot + strike_zone_top) / 2.0, Span::raw(" |"));
+                    ctx.print(x, strike_zone_bot - 4.0, Span::raw("/\\"));
                 }
             })
             .x_bounds([-25.0, 25.0])
