@@ -2,7 +2,7 @@ Made a few changes, might pull request later, idk:
 - Placed a small [B] sprite that shows where the batter is relative to the strike zone
 - The box score window now highlights the current batter
 - Added a config option (pitcher_view = true) that flips the entire strike zone display across the y-axis
-- Added a config option (auto_swap_box = true) that automatically changes the box score window to display the batting team
+- Added a config option (auto_swap_box = true) that automatically changes the box score window to display the batting team when a half-inning ends
 - Added a config option (chat_style_feed = true) that changes the game info feed from log-style to chat-style (new events appear at the bottom)
 - Added a hotkey (c) for the stats page that automatically changes the date to the current date
 
