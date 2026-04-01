@@ -52,9 +52,10 @@ impl Widget for AtBatWidget<'_> {
             .unwrap_or("");
         // In pitcher view: RHB stands on the right, LHB on the left.
         // In umpire view: reversed. Switch hitters get no sprite.
+        // x positions are centered in the gap between the zone edge (±8.5) and canvas edge (±25).
         let sprite_x: Option<f64> = match (batter_side, pitcher_view) {
-            ("R", true) | ("L", false) => Some(12.0),
-            ("L", true) | ("R", false) => Some(-20.0),
+            ("R", true) | ("L", false) => Some(21.0),
+            ("L", true) | ("R", false) => Some(-24.0),
             _ => None,
         };
 
@@ -95,9 +96,11 @@ impl Widget for AtBatWidget<'_> {
                     }
                 }
                 if let Some(x) = sprite_x {
-                    ctx.print(x, strike_zone_top + 4.0, Span::raw(" o"));
-                    ctx.print(x, (strike_zone_bot + strike_zone_top) / 2.0, Span::raw(" |"));
-                    ctx.print(x, strike_zone_bot - 4.0, Span::raw("/\\"));
+                    ctx.print(
+                        x,
+                        (strike_zone_bot + strike_zone_top) / 2.0,
+                        Span::raw("[B]"),
+                    );
                 }
             })
             .x_bounds([-25.0, 25.0])
