@@ -2,7 +2,7 @@ use crate::state::app_state::HomeOrAway;
 use crate::state::boxscore::BoxscoreState;
 use crate::ui::scroll::{ScrollParams, adjust_area_for_scroll, render_scrollbar};
 use tui::prelude::*;
-use tui::widgets::{Block, Borders, Cell, Row, Table};
+use tui::widgets::{Block, Borders, Row, Table};
 
 const BATTER_WIDTHS: [Constraint; 9] = [
     Constraint::Length(25), // player name
@@ -168,17 +168,16 @@ impl TeamBatterBoxscoreWidget<'_> {
     }
 }
 
-fn create_table<'a, I, R>(
+fn create_table<'a, I>(
     rows: I,
     widths: &[Constraint],
     header: &'static [&'static str],
     skip_rows: usize,
 ) -> Table<'a>
 where
-    I: IntoIterator<Item = R>,
-    R: IntoIterator<Item = Cell<'a>>,
+    I: IntoIterator<Item = Row<'a>>,
 {
-    Table::new(rows.into_iter().skip(skip_rows).map(Row::new), widths)
+    Table::new(rows.into_iter().skip(skip_rows), widths)
         .column_spacing(0)
         .style(Style::default().fg(Color::White))
         .header(Row::new(header.iter().copied()).bold().underlined())

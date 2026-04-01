@@ -6,7 +6,7 @@ use crate::state::app_state::HomeOrAway::{Away, Home};
 use mlbt_api::live::LiveResponse;
 use std::collections::HashMap;
 use tui::prelude::*;
-use tui::widgets::{Block, Cell, Paragraph, ScrollbarState, Wrap};
+use tui::widgets::{Block, Paragraph, Row, ScrollbarState, Wrap};
 
 const LAYOUT_SPACING: usize = 3;
 
@@ -14,6 +14,7 @@ const LAYOUT_SPACING: usize = 3;
 pub struct BoxscoreState {
     pub game_id: u64,
     pub active_team: HomeOrAway,
+    pub current_batter_id: Option<u64>,
     pub boxscore: Boxscore,
     pub scroll: usize,
     pub scroll_state: ScrollbarState,
@@ -165,14 +166,15 @@ impl BoxscoreState {
     pub fn get_batting_rows<'a>(
         &'a self,
         team: HomeOrAway,
-    ) -> impl Iterator<Item = Vec<Cell<'a>>> + 'a {
-        self.boxscore.to_batting_table_rows(team)
+    ) -> impl Iterator<Item = Row<'a>> + 'a {
+        self.boxscore
+            .to_batting_table_rows(team, self.current_batter_id)
     }
 
     pub fn get_pitching_rows<'a>(
         &'a self,
         team: HomeOrAway,
-    ) -> impl Iterator<Item = Vec<Cell<'a>>> + 'a {
+    ) -> impl Iterator<Item = Row<'a>> + 'a {
         self.boxscore.to_pitching_table_rows(team)
     }
 

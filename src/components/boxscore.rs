@@ -4,9 +4,9 @@ use mlbt_api::boxscore::{LabelValue, Player as ApiPlayer, Team};
 use mlbt_api::live::LiveResponse;
 use std::collections::HashMap;
 use tui::prelude::{Line, Stylize};
-use tui::style::Color;
+use tui::style::{Color, Style};
 use tui::text::Span;
-use tui::widgets::Cell;
+use tui::widgets::{Cell, Row};
 
 const SECONDARY_COLOR: Color = Color::DarkGray;
 
@@ -23,6 +23,7 @@ pub struct Boxscore {
 
 #[derive(Default)]
 pub struct BatterBoxscore {
+    player_id: u64,
     name: String,
     position: String,
     at_bats: u16,
@@ -75,12 +76,14 @@ pub struct GameNote {
 
 impl BatterBoxscore {
     pub fn from_data(
+        player_id: u64,
         player: &ApiPlayer,
         player_name: &Player,
         note: Option<String>,
         is_substitute: bool,
     ) -> Self {
         BatterBoxscore {
+            player_id,
             name: player_name.boxscore_name.clone(),
             position: player.position.abbreviation.to_string(),
             at_bats: player.stats.batting.at_bats.unwrap_or(0),
@@ -326,6 +329,7 @@ impl Boxscore {
                 // determine if this is a starter or substitute based on batting order
                 let is_starter = batting_order.ends_with('0');
                 let batter = BatterBoxscore::from_data(
+                    player_id,
                     player,
                     player_name,
                     player.stats.batting.note.clone(),
@@ -337,6 +341,7 @@ impl Boxscore {
 
         // add total row
         batters.push(BatterBoxscore {
+            player_id: 0,
             name: "Totals".to_string(),
             position: "".to_string(),
             at_bats: team.team_stats.batting.at_bats.unwrap_or_default(),
@@ -357,11 +362,20 @@ impl Boxscore {
     pub fn to_batting_table_rows<'a>(
         &'a self,
         active: HomeOrAway,
-    ) -> impl Iterator<Item = Vec<Cell<'a>>> + 'a {
-        match active {
-            HomeOrAway::Home => self.home_batting.iter().map(BatterBoxscore::to_cells),
-            HomeOrAway::Away => self.away_batting.iter().map(BatterBoxscore::to_cells),
-        }
+        current_batter_id: Option<u64>,
+    ) -> impl Iterator<Item = Row<'a>> + 'a {
+        let batters = match active {
+            HomeOrAway::Home => self.home_batting.as_slice(),
+            HomeOrAway::Away => self.away_batting.as_slice(),
+        };
+        batters.iter().map(move |b| {
+            let row = Row::new(b.to_cells());
+            if b.player_id != 0 && current_batter_id == Some(b.player_id) {
+                row.style(Style::default().bg(Color::Blue).fg(Color::Black))
+            } else {
+                row
+            }
+        })
     }
 
     pub fn count_batting_table_rows(&self, active: HomeOrAway) -> usize {
@@ -374,11 +388,12 @@ impl Boxscore {
     pub fn to_pitching_table_rows<'a>(
         &'a self,
         active: HomeOrAway,
-    ) -> impl Iterator<Item = Vec<Cell<'a>>> + 'a {
-        match active {
-            HomeOrAway::Home => self.home_pitching.iter().map(PitcherBoxscore::to_cells),
-            HomeOrAway::Away => self.away_pitching.iter().map(PitcherBoxscore::to_cells),
-        }
+    ) -> impl Iterator<Item = Row<'a>> + 'a {
+        let pitchers = match active {
+            HomeOrAway::Home => self.home_pitching.as_slice(),
+            HomeOrAway::Away => self.away_pitching.as_slice(),
+        };
+        pitchers.iter().map(|p| Row::new(p.to_cells()))
     }
 
     pub fn count_pitching_table_rows(&self, active: HomeOrAway) -> usize {

@@ -95,6 +95,8 @@ impl App {
             self.state
                 .box_score
                 .update(live_data, &self.state.gameday.game.players);
+            self.state.box_score.current_batter_id =
+                Some(self.state.gameday.game.get_latest_at_bat().matchup.batter_id);
 
             if self.settings.box_auto_swap {
                 let top_after = self.state.gameday.game.get_latest_at_bat().is_top_inning;
