@@ -2,6 +2,7 @@ use crate::app::{App, DebugState, MenuItem};
 use crate::components::stats::table::TeamOrPlayer;
 use crate::state::stats::ActivePane;
 use crate::{NetworkRequest, cleanup_terminal};
+use chrono::Local;
 use crossterm::event::KeyCode::Char;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use mlbt_api::client::StatGroup;
@@ -175,6 +176,13 @@ pub async fn handle_key_bindings(
         (MenuItem::Stats, Char('s'), _) => guard.state.stats.store_sort_column(),
         (MenuItem::Stats, KeyCode::Left | KeyCode::Right | KeyCode::Tab, _) => {
             guard.state.stats.switch_pane()
+        }
+        (MenuItem::Stats, Char('c'), _) => {
+            guard
+                .state
+                .stats
+                .set_date_from_valid_input(Local::now().date_naive());
+            load_stats(guard, network_requests).await;
         }
         (MenuItem::Stats, Char(':'), _) => guard.update_tab(MenuItem::DatePicker),
 

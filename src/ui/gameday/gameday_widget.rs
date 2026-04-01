@@ -16,6 +16,7 @@ pub struct GamedayWidget<'a> {
     pub state: &'a GamedayState,
     pub boxscore_state: &'a mut BoxscoreState,
     pub active: HomeOrAway,
+    pub chat_style_feed: bool,
 }
 
 impl Widget for GamedayWidget<'_> {
@@ -67,6 +68,7 @@ impl Widget for GamedayWidget<'_> {
             let innings_widget = InningPlaysWidget {
                 game: &self.state.game,
                 selected_at_bat: self.state.selected_at_bat(),
+                chat_style_feed: self.chat_style_feed,
             };
             Widget::render(innings_widget, chunks[0], buf);
 

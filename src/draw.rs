@@ -212,6 +212,7 @@ fn draw_gameday(f: &mut Frame, rect: Rect, app: &mut App) {
             active: app.state.box_score.active_team,
             state: &app.state.gameday,
             boxscore_state: &mut app.state.box_score,
+            chat_style_feed: app.settings.chat_style_feed,
         },
         rect,
     );

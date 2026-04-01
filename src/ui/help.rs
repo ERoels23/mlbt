@@ -40,7 +40,7 @@ const GAMEDAY_DOCS: &[&[&str; 2]; 12] = &[
     &["Go to live at bat", "l"],
     &["Go to first at bat", "s"],
 ];
-const STATS_DOCS: &[&[&str; 2]; 16] = &[
+const STATS_DOCS: &[&[&str; 2]; 17] = &[
     &["Stats", "3"],
     &["Switch hitting/pitching", "h/p"],
     &["Switch team/player", "t/l"],
@@ -51,6 +51,7 @@ const STATS_DOCS: &[&[&str; 2]; 16] = &[
     &["Page up", "Shift + k/↑"],
     &["View player/team", "Enter"],
     &["Select date", ":"],
+    &["Jump to current date", "c"],
     &["Search", " "],
     &[" Fuzzy search", "Ctrl + f"],
     &["Options", " "],

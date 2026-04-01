@@ -39,6 +39,10 @@ pub struct ConfigFile {
     /// Optional log level to use. If not present, the default is `Error`.
     /// Set the level using a lowercase string, e.g. "error".
     pub log_level: Option<LogLevel>,
+
+    /// If true, the game info play feed displays in chat style: oldest entries at the top,
+    /// newest entries at the bottom. Defaults to false (log style: newest at top).
+    pub chat_style_feed: Option<bool>,
 }
 
 impl Default for ConfigFile {
@@ -47,6 +51,7 @@ impl Default for ConfigFile {
             favorite_team: None,
             timezone: Some(ConfigFile::DEFAULT_TIMEZONE),
             log_level: None,
+            chat_style_feed: None,
         }
     }
 }
@@ -60,6 +65,7 @@ impl Into<AppSettings> for ConfigFile {
             timezone: self.validate_timezone(),
             timezone_abbreviation: self.get_timezone_abbreviation(),
             log_level: self.validate_log_level(),
+            chat_style_feed: self.chat_style_feed.unwrap_or(false),
         }
     }
 }

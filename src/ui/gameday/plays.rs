@@ -17,12 +17,13 @@ pub const SELECTION_SYMBOL: char = '>';
 pub struct InningPlaysWidget<'a> {
     pub game: &'a GameState,
     pub selected_at_bat: Option<u8>,
+    pub chat_style_feed: bool,
 }
 
 impl Widget for InningPlaysWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         // TODO this doesn't scroll properly. needs to be a list for that
-        let inning_plays = format_plays(self.game, self.selected_at_bat);
+        let inning_plays = format_plays(self.game, self.selected_at_bat, self.chat_style_feed);
         let paragraph = Paragraph::new(inning_plays).wrap(Wrap { trim: false });
 
         Widget::render(paragraph, area, buf);
@@ -30,7 +31,7 @@ impl Widget for InningPlaysWidget<'_> {
 }
 
 /// Format the plays for the current inning as TUI Lines.
-fn format_plays(game: &GameState, selected_at_bat: Option<u8>) -> Vec<Line<'_>> {
+fn format_plays(game: &GameState, selected_at_bat: Option<u8>, chat_style: bool) -> Vec<Line<'_>> {
     let (at_bat, _is_current) = game.get_at_bat_by_index_or_current(selected_at_bat);
     let inning = at_bat.inning;
 
@@ -43,7 +44,13 @@ fn format_plays(game: &GameState, selected_at_bat: Option<u8>) -> Vec<Line<'_>> 
     // Track last inning and top/bottom half
     let mut last_inning: Option<(bool, u8)> = None;
 
-    for play in game.at_bats.values().rev() {
+    let plays: Box<dyn Iterator<Item = _>> = if chat_style {
+        Box::new(game.at_bats.values())
+    } else {
+        Box::new(game.at_bats.values().rev())
+    };
+
+    for play in plays {
         let current_inning = (play.is_top_inning, play.inning);
         if play.inning != inning {
             continue;
