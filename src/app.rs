@@ -89,11 +89,24 @@ impl App {
         // only update gameday if the selected game is the same as the game being updated
         // this prevents gameday from showing incorrect data if the user scrolls through games quickly
         if Some(live_data.game_pk) == self.state.schedule.get_selected_game_opt() {
+            let top_before = self.state.gameday.game.get_latest_at_bat().is_top_inning;
             self.state.gameday.game.update(live_data, win_probability);
             // update this after the gameday so the players are correct
             self.state
                 .box_score
                 .update(live_data, &self.state.gameday.game.players);
+
+            if self.settings.box_auto_swap {
+                let top_after = self.state.gameday.game.get_latest_at_bat().is_top_inning;
+                if top_after != top_before {
+                    // top of inning = away team batting, bottom = home team batting
+                    if top_after {
+                        self.state.box_score.set_away_active();
+                    } else {
+                        self.state.box_score.set_home_active();
+                    }
+                }
+            }
 
             // only reset the scroll state if on the scoreboard tab. this will reset when a new game
             // is selected or the data refreshes. don't reset the scroll in Gameday because that

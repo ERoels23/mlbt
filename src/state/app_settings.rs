@@ -12,6 +12,7 @@ pub struct AppSettings {
     pub log_level: Option<LevelFilter>,
     pub chat_style_feed: bool,
     pub pitcher_view: bool,
+    pub box_auto_swap: bool,
 }
 
 impl AppSettings {

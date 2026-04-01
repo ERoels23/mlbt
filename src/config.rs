@@ -47,6 +47,10 @@ pub struct ConfigFile {
     /// If true, the strike zone display is flipped to pitcher's perspective (left/right mirrored).
     /// Defaults to false (umpire/catcher view).
     pub pitcher_view: Option<bool>,
+
+    /// If true, the boxscore automatically switches to show the currently batting team whenever
+    /// a half-inning ends. Defaults to false.
+    pub box_auto_swap: Option<bool>,
 }
 
 impl Default for ConfigFile {
@@ -57,6 +61,7 @@ impl Default for ConfigFile {
             log_level: None,
             chat_style_feed: None,
             pitcher_view: None,
+            box_auto_swap: None,
         }
     }
 }
@@ -72,6 +77,7 @@ impl Into<AppSettings> for ConfigFile {
             log_level: self.validate_log_level(),
             chat_style_feed: self.chat_style_feed.unwrap_or(false),
             pitcher_view: self.pitcher_view.unwrap_or(false),
+            box_auto_swap: self.box_auto_swap.unwrap_or(false),
         }
     }
 }
