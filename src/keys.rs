@@ -202,8 +202,20 @@ pub async fn handle_key_bindings(
         (MenuItem::Gameday, Char('K') | KeyCode::Up, KeyModifiers::SHIFT) => {
             guard.state.box_score.scroll_up()
         }
-        (MenuItem::Gameday, Char('j') | KeyCode::Down, _) => guard.state.gameday.previous_at_bat(),
-        (MenuItem::Gameday, Char('k') | KeyCode::Up, _) => guard.state.gameday.next_at_bat(),
+        (MenuItem::Gameday, Char('j') | KeyCode::Down, _) => {
+            if guard.settings.chat_style_feed {
+                guard.state.gameday.next_at_bat()
+            } else {
+                guard.state.gameday.previous_at_bat()
+            }
+        }
+        (MenuItem::Gameday, Char('k') | KeyCode::Up, _) => {
+            if guard.settings.chat_style_feed {
+                guard.state.gameday.previous_at_bat()
+            } else {
+                guard.state.gameday.next_at_bat()
+            }
+        }
         (MenuItem::Gameday, Char('l'), _) => guard.state.gameday.live(),
         (MenuItem::Gameday, Char('s'), _) => guard.state.gameday.start(),
 

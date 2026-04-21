@@ -20,6 +20,9 @@ pub struct BoxscoreState {
     pub scroll_state: ScrollbarState,
     pub cache: RenderCache,
     pub max_scroll: usize,
+    /// Tracks the last inning half that triggered an auto-swap. None means no swap has happened
+    /// yet for the current game, so the first update always sets the correct team.
+    pub auto_swap_half: Option<bool>,
 }
 
 #[derive(Default)]

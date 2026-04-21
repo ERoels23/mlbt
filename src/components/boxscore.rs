@@ -104,7 +104,7 @@ impl BatterBoxscore {
         }
     }
 
-    pub fn to_cells(&self) -> Vec<Cell<'_>> {
+    pub fn to_cells(&self, highlight: bool) -> Vec<Cell<'_>> {
         let note = self.note.as_deref().unwrap_or_default();
         let prefix = match self.is_substitute {
             true => "  ".to_string(),
@@ -114,6 +114,14 @@ impl BatterBoxscore {
             (
                 Span::from("Totals").fg(SECONDARY_COLOR).into(),
                 SECONDARY_COLOR,
+            )
+        } else if highlight {
+            (
+                Line::from(vec![
+                    Span::from(format!("{prefix}{note}{} ", self.name)).fg(Color::Black),
+                    Span::from(self.position.clone()).fg(Color::DarkGray),
+                ]),
+                Color::Black,
             )
         } else {
             (
@@ -369,9 +377,10 @@ impl Boxscore {
             HomeOrAway::Away => self.away_batting.as_slice(),
         };
         batters.iter().map(move |b| {
-            let row = Row::new(b.to_cells());
-            if b.player_id != 0 && current_batter_id == Some(b.player_id) {
-                row.style(Style::default().bg(Color::Blue).fg(Color::Black))
+            let is_highlighted = b.player_id != 0 && current_batter_id == Some(b.player_id);
+            let row = Row::new(b.to_cells(is_highlighted));
+            if is_highlighted {
+                row.style(Style::default().bg(Color::Blue))
             } else {
                 row
             }

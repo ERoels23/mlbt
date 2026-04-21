@@ -89,7 +89,6 @@ impl App {
         // only update gameday if the selected game is the same as the game being updated
         // this prevents gameday from showing incorrect data if the user scrolls through games quickly
         if Some(live_data.game_pk) == self.state.schedule.get_selected_game_opt() {
-            let top_before = self.state.gameday.game.get_latest_at_bat().is_top_inning;
             self.state.gameday.game.update(live_data, win_probability);
             // update this after the gameday so the players are correct
             self.state
@@ -99,14 +98,15 @@ impl App {
                 Some(self.state.gameday.game.get_latest_at_bat().matchup.batter_id);
 
             if self.settings.box_auto_swap {
-                let top_after = self.state.gameday.game.get_latest_at_bat().is_top_inning;
-                if top_after != top_before {
+                let is_top = self.state.gameday.game.get_latest_at_bat().is_top_inning;
+                if self.state.box_score.auto_swap_half != Some(is_top) {
                     // top of inning = away team batting, bottom = home team batting
-                    if top_after {
+                    if is_top {
                         self.state.box_score.set_away_active();
                     } else {
                         self.state.box_score.set_home_active();
                     }
+                    self.state.box_score.auto_swap_half = Some(is_top);
                 }
             }
 
