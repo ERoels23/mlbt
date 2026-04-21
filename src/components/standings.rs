@@ -417,7 +417,7 @@ impl Division {
             }
         } else {
             // ensure display order is the same
-            s.sort_by(|a, b| a.id.cmp(&b.id));
+            s.sort_by_key(|a| a.id);
         }
 
         s

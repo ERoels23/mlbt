@@ -166,18 +166,12 @@ impl BoxscoreState {
         team_content_height + self.cache.game_notes_height as u16
     }
 
-    pub fn get_batting_rows<'a>(
-        &'a self,
-        team: HomeOrAway,
-    ) -> impl Iterator<Item = Row<'a>> + 'a {
+    pub fn get_batting_rows<'a>(&'a self, team: HomeOrAway) -> impl Iterator<Item = Row<'a>> + 'a {
         self.boxscore
             .to_batting_table_rows(team, self.current_batter_id)
     }
 
-    pub fn get_pitching_rows<'a>(
-        &'a self,
-        team: HomeOrAway,
-    ) -> impl Iterator<Item = Row<'a>> + 'a {
+    pub fn get_pitching_rows<'a>(&'a self, team: HomeOrAway) -> impl Iterator<Item = Row<'a>> + 'a {
         self.boxscore.to_pitching_table_rows(team)
     }
 
